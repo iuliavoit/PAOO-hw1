@@ -18,7 +18,7 @@ int *age, *weight;
 // Normal constructor
 Animal::Animal(int a, int w, string n)
 {
-    cout << "Normal constructor called.\n";
+    cout << "Normal constructor of class Animal called.\n";
     age = new int;
     weight = new int;
     name = new string;
@@ -54,9 +54,9 @@ Animal::Animal(Animal &&a)
 Animal::~Animal()
 {
     cout << "Freeing animal; destructor called\n";
-    delete age;
-    delete weight;
-    delete name;
+    if(age!=nullptr) delete age;
+    if(weight != nullptr) delete weight;
+    //if(name!=nullptr) delete []name;
 }
 
 Animal createAnimal(int a, int w, string n)
@@ -87,6 +87,12 @@ int *milkLiters;
         cout << "Cow destroyed.Destructor of class Cow has been called"
              << "\n";
     }
+    
+};
+
+class Pig : public Animal
+{
+    ~Pig() = delete ;
 };
 
 int* getMilkLiters(Cow c)
