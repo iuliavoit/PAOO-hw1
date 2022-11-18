@@ -5,7 +5,7 @@ class Animal
 {
 
 public:
-int *age, *weight;
+    int *age, *weight;
     string *name;
     Animal(int a, int w, string n); // constructor
     Animal(const Animal &a);        // copy constructor
@@ -54,10 +54,13 @@ Animal::Animal(Animal &&a)
 Animal::~Animal()
 {
     cout << "Freeing animal; destructor called\n";
-    if(age!=nullptr) delete age;
-    if(weight != nullptr) delete weight;
-    //if(name!=nullptr) delete []name;
+    if (age != nullptr)
+        delete age;
+    if (weight != nullptr)
+        delete weight;
+     if(name!=nullptr) delete []name;
 }
+
 
 Animal createAnimal(int a, int w, string n)
 {
@@ -69,7 +72,7 @@ class Cow : public Animal
 {
 
 public:
-int *milkLiters;
+    int *milkLiters;
     Cow(int lit, int a, int w, string n) : Animal(a, w, n)
     {
         cout << "Constructor of class Cow has been called"
@@ -80,22 +83,42 @@ int *milkLiters;
 
     ~Cow()
     {
-        delete age;
-        delete weight;
-        delete name;
-        delete milkLiters;
+        if(milkLiters!=nullptr) delete milkLiters;
         cout << "Cow destroyed.Destructor of class Cow has been called"
              << "\n";
     }
-    
 };
 
 class Pig : public Animal
 {
-    ~Pig() = delete ;
+
+public:
+    int *daysUntilChristmas;
+    Pig(int d, int a, int w, string n) : Animal(a, w, n)
+    {
+        daysUntilChristmas = new int;
+        *daysUntilChristmas = d;
+        cout << "Constructor of class Pig has been called"
+             << "\n";
+    }
+
+    Pig::Pig(const Pig &p) = delete;
+
+    ~Pig()
+    {
+        if(daysUntilChristmas!=nullptr)
+        delete daysUntilChristmas;
+        cout << "Pig destroyed.Destructor of class Pig has been called"
+             << "\n";
+    }
+
+    int *getDaysUntilChristmas(Pig p)
+    {
+       return p.daysUntilChristmas;
+    }
 };
 
-int* getMilkLiters(Cow c)
+int *getMilkLiters(Cow c)
 {
     return c.milkLiters;
 }
@@ -103,14 +126,19 @@ int* getMilkLiters(Cow c)
 int main()
 {
     Animal a(1, 100, "Animal1"); // normal constr
-    cout<<"Animal is " <<a.getAnimalAge()<<" yrs old \n";
-    Animal b(a);                 // copy constr
-      cout<<"Animal b is " <<b.getAnimalAge()<<" yrs old \n";
+    cout << "Animal is " << a.getAnimalAge() << " yrs old \n";
+    Animal b(a); // copy constr
+    cout << "Animal b is " << b.getAnimalAge() << " yrs old \n";
     Animal c(std::move(a));
-      cout<<"Animal b weights " <<b.getAnimalAWeight()<<" kgs \n";
+    cout << "Animal b weights " << b.getAnimalAWeight() << " kgs \n";
 
-      Cow cow(10, 2,230,"Milka");
-       cout<<"Cow is " <<cow.getAnimalAge()<<" yrs old \n";
+    Cow cow(10, 2, 230, "Milka");
+    cout << "Cow is " << cow.getAnimalAge() << " yrs old \n";
+
+    Pig pig(46, 3, 20, "Mr.Pig");
+    cout <<*pig.name<< " has " << *pig.daysUntilChristmas << " days to live \n";
+    //Pig pig2(pig);  -> can't happen 
+    
     return 0;
 }
 /*#include <iostream>
