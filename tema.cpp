@@ -7,13 +7,34 @@ class Animal
 public:
     int *age, *weight;
     string *name;
+    Animal();
     Animal(int a, int w, string n); // constructor
     Animal(const Animal &a);        // copy constructor
     Animal(Animal &&a);             // move constructor
     ~Animal();                      // destructor
     int getAnimalAge() { return *age; }
     int getAnimalAWeight() { return *weight; }
+
+    // Animal copy assignment operator
+    Animal &operator=(const Animal &a)
+    {
+        // handling assignment to self
+        if (this == &a)
+        {
+            cout << "Assigned object to itself\n";
+            return *this;
+        }
+        age = a.age;
+        weight = a.weight;
+        name = a.name;
+        cout << "Inside of animal copy assignment operator\n";
+        return *this;
+    }
 };
+// default constructor
+Animal::Animal()
+{
+}
 
 // Normal constructor
 Animal::Animal(int a, int w, string n)
@@ -26,6 +47,7 @@ Animal::Animal(int a, int w, string n)
     *weight = w;
     *name = n;
 }
+
 // Copy constructor.
 Animal::Animal(const Animal &a)
 {
@@ -53,14 +75,14 @@ Animal::Animal(Animal &&a)
 // Desctructor
 Animal::~Animal()
 {
-    cout << "Freeing animal; destructor called\n";
+    cout << "Destructor of class Animal called\n";
     if (age != nullptr)
         delete age;
     if (weight != nullptr)
         delete weight;
-     if(name!=nullptr) delete []name;
+    if (name != nullptr)
+        delete name;
 }
-
 
 Animal createAnimal(int a, int w, string n)
 {
@@ -73,6 +95,7 @@ class Cow : public Animal
 
 public:
     int *milkLiters;
+    Cow(){};
     Cow(int lit, int a, int w, string n) : Animal(a, w, n)
     {
         cout << "Constructor of class Cow has been called"
@@ -81,9 +104,25 @@ public:
         *milkLiters = lit;
     }
 
+    // Animal copy assignment operator
+    Cow &operator=(const Cow &c)
+    {
+        // handling assignment to self
+        if (this == &c)
+        {
+            cout << "Assigned object to itself\n";
+            return *this;
+        }
+        milkLiters = c.milkLiters;
+        Animal::operator=(c); // assigning  base class parts to the new obj
+        cout << "Inside of cow copy assignment operator\n";
+        return *this;
+    }
+
     ~Cow()
     {
-        if(milkLiters!=nullptr) delete milkLiters;
+        if (milkLiters != nullptr)
+            delete milkLiters;
         cout << "Cow destroyed.Destructor of class Cow has been called"
              << "\n";
     }
@@ -102,19 +141,19 @@ public:
              << "\n";
     }
 
-    Pig::Pig(const Pig &p) = delete;
+    Pig(const Pig &p) = delete;
 
     ~Pig()
     {
-        if(daysUntilChristmas!=nullptr)
-        delete daysUntilChristmas;
+        if (daysUntilChristmas != nullptr)
+            delete daysUntilChristmas;
         cout << "Pig destroyed.Destructor of class Pig has been called"
              << "\n";
     }
 
     int *getDaysUntilChristmas(Pig p)
     {
-       return p.daysUntilChristmas;
+        return p.daysUntilChristmas;
     }
 };
 
@@ -126,99 +165,20 @@ int *getMilkLiters(Cow c)
 int main()
 {
     Animal a(1, 100, "Animal1"); // normal constr
-    cout << "Animal is " << a.getAnimalAge() << " yrs old \n";
-    Animal b(a); // copy constr
-    cout << "Animal b is " << b.getAnimalAge() << " yrs old \n";
-    Animal c(std::move(a));
-    cout << "Animal b weights " << b.getAnimalAWeight() << " kgs \n";
+    a = a;                       // assigning object to itself
+    Animal b;
 
+    b = a; // using the copy assignment operator
+
+    cout << "First animal age: " << a.getAnimalAge();
+    cout << "\n Second animal age: " << b.getAnimalAge();
+    cout << "\n";
+
+    // Copy all parts of an object.
     Cow cow(10, 2, 230, "Milka");
-    cout << "Cow is " << cow.getAnimalAge() << " yrs old \n";
-
-    Pig pig(46, 3, 20, "Mr.Pig");
-    cout <<*pig.name<< " has " << *pig.daysUntilChristmas << " days to live \n";
-    //Pig pig2(pig);  -> can't happen 
-    
+    Cow cow2;
+    cow2 = cow;
+    cout << cow2.getAnimalAge(); // should work bc of line 119
+    cout<<"\n";
     return 0;
 }
-/*#include <iostream>
-using namespace std;
-
-class Animal{
-
-    public:
-        string animalName, animalGender, animalSound;
-        int animalAge;
-        Animal(string name, string gender, string sound, int age){
-            cout << "Constructor of class Animal has been called" <<"\n";
-            animalName = name;
-            animalGender = gender;
-            animalSound = sound;
-            animalAge = age;
-        }
-
-        ~Animal() {
-            if(animalAge!=nullptr) delete animalAge;
-
-            cout << "Animal destroyed.Destructor of main class Animal has been called" <<"\n";
-        }
-
-        Animal(const Animal& a) {  //copies  the data of the existing object and assignes it to the new object --deep copy
-            cout << "Copy constructor of main class Animal has been called  " <<"\n";
-            animalName = a.animalName;
-            animalGender = a.animalGender;
-            animalSound = a.animalSound;
-            animalAge = a.animalAge;
-        }
-
-        Animal(Animal&& a) { //works with rvalue references and points to the already existing object in the memory; prevents more than 1 obj to poiny to the same memory location
-            a.animalName = nullptr;
-            a.animalGender = nullptr;
-            a.animalSound = nullptr;
-            a.animalAge = nullptr;
-            cout<<"Move constructor of main class Animal has been called." <<"\n";
-        }
-
-        void makeAnimalSound() {
-               cout << "Animal sound is : " << animalSound <<"\n";
-        }
-
-        string getName() {
-             return animalName;
-        }
-
-};
-
-class Cow : public Animal {
-
-    public:
-        int milkAmountPerDay;
-        Cow(int amount, string animalName, string animalGender, string animalSound, int animalAge) : Animal( animalName,  animalGender,  animalSound,  animalAge){
-             cout << "Constructor of class Cow has been called" <<"\n";
-            milkAmountPerDay = amount;
-        }
-
-        ~Cow() {
-             cout << "Cow destroyed.Destructor of class Cow has been called" <<"\n";
-        }
-
-
-};
-
-int main()
-{
-    Animal a("NormalAnimal","male","normalSound",1);
-    Animal a2(a);  //copy constructor is called
-    Cow milka( 100, "Milka", "female", "mooo", 2);
-
-    cout<<milka.getName()<<"\n";
-    milka.makeAnimalSound();
-
-   cout<<"Calling the move constructor :";
-   cout<<"\n";
-
-
-   //lvalue = an object reference; rvalue = a value
-    return 0; //destructors are called
-}
-*/
